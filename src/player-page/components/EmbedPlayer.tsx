@@ -33,6 +33,7 @@ import { useLiveMode } from '../hooks/useLiveMode';
 import { useQualityGuard } from '../hooks/useQualityGuard';
 import { usePlaybackRecovery } from '../hooks/usePlaybackRecovery';
 import { useKeepAwake } from '../hooks/useKeepAwake';
+import { useLibraryWatchProgress } from '../hooks/useLibraryWatchProgress';
 import { readPreferredQualityHeight } from './preferredQuality';
 import { PlayerStorage } from './playerStorage';
 import type { Video, SkipMeta } from '../types';
@@ -81,6 +82,7 @@ export function EmbedPlayer() {
   const readyFiredRef = useRef(false);
 
   const { data, meta, loading, offlineNav, fetchVideo, setPrefetchedData } = useVideoData(id, vid);
+  const reportLibraryProgress = useLibraryWatchProgress(isOffline ? data?._id ?? null : null);
   const { liveState, setLiveMode, liveSeek, updateViewerCount, endLiveMode } = useLiveMode(playerRef);
   const canvasRef = useColorExtraction();
   const enhancementContainerRef = useRef<HTMLDivElement>(null);
@@ -367,9 +369,12 @@ export function EmbedPlayer() {
     readyFiredRef.current = true;
   }
 
-  function onEnded() {
+  async function onEnded() {
     playback.disarm();
     keepAwake.release();
+    if (isOffline && playerRef.current) {
+      await reportLibraryProgress(playerRef.current.currentTime, playerRef.current.duration);
+    }
     if (isOffline && offlineNav?.nextEpisodeId) {
       // INTENTIONAL `any` — offline player has no preload bridge. See OPEN-SOURCE-AUDIT.md §2.
       (window as any).animecix?.playOfflineEpisode?.(offlineNav.nextEpisodeId); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -484,6 +489,10 @@ export function EmbedPlayer() {
         onError={qualityGuard.handleError}
         onCanPlay={onCanPlay}
         onEnded={onEnded}
+        onTimeUpdate={() => {
+          const player = playerRef.current;
+          if (player) void reportLibraryProgress(player.currentTime, player.duration);
+        }}
         onPlay={onPlay}
         onPause={onPause}
         onFullscreenChange={(isFullscreen: boolean) => {

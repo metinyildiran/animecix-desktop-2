@@ -59,6 +59,7 @@ export interface LibraryEpisode {
   sizeBytes: number;
   createdAt: number;
   offlineUrl: string;
+  watched: boolean;
 }
 
 // Push notification payload after normalisation (Phase 9).
@@ -159,6 +160,7 @@ export interface AnimecixAPI {
   getLibraryAnimes: () => Promise<LibraryAnime[]>;
   getLibraryEpisodes: (animeTitle: string) => Promise<LibraryEpisode[]>;
   showLibrary: () => Promise<void>;
+  reportLibraryProgress: (episodeId: string, currentTime: number, duration: number) => Promise<void>;
   hideLibrary: () => Promise<void>;
   playOfflineEpisode: (episodeId: string) => Promise<void>;
 

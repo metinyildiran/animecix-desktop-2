@@ -70,4 +70,10 @@ export const INIT_SCHEMA = `
   INSERT OR IGNORE INTO settings (key, value) VALUES ('_migration_ep_meta_video_path', '0');
 
   CREATE INDEX IF NOT EXISTS idx_episode_metadata_anime ON episode_metadata (anime_title);
+
+  -- Separate from metadata so re-downloading an episode preserves its watched state.
+  CREATE TABLE IF NOT EXISTS library_watched (
+    episode_id TEXT PRIMARY KEY NOT NULL,
+    watched_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );
 `;

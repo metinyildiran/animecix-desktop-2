@@ -17,4 +17,5 @@ export interface LibraryEpisode {
   sizeBytes: number;
   createdAt: number;
   offlineUrl: string;
+  watched: boolean;
 }

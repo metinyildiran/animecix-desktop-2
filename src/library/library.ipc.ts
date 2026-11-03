@@ -15,6 +15,7 @@
 import { ipcMain, BrowserWindow, net, app } from 'electron';
 import { StorageService } from '../storage/StorageService';
 import { LibraryManager } from './LibraryManager';
+import { isEpisodeWatched } from './watch-progress';
 import { pruneMissingDownloads } from '../download/prune-missing';
 import type { Video, SkipMeta } from '../player-page/types';
 import path from 'node:path';
@@ -43,6 +44,20 @@ export function registerLibraryIpc(
   libraryManager: LibraryManager,
   downloadsDir: string,
 ): void {
+  let playingEpisodeId: string | null = null;
+  let playerUrl: string | null = null;
+
+  ipcMain.handle('library:progress', (event, episodeId: string, currentTime: number, duration: number) => {
+    // Only the top-level player launched from this library may report progress.
+    if (event.sender !== mainWindow.webContents
+      || event.senderFrame !== mainWindow.webContents.mainFrame
+      || event.senderFrame?.url !== playerUrl
+      || typeof episodeId !== 'string'
+      || episodeId !== playingEpisodeId
+      || !isEpisodeWatched(currentTime, duration)) return;
+    storage.markLibraryEpisodeWatched(episodeId);
+  });
+
   ipcMain.handle('library:getAnimes', async () => {
     return storage.getLibraryAnimes();
   });
@@ -52,6 +67,7 @@ export function registerLibraryIpc(
   });
 
   ipcMain.handle('library:show', async () => {
+    playingEpisodeId = null;
     // Freshen the library first: drop records whose video file was deleted
     // manually, so the overlay never shows episodes that no longer exist.
     pruneMissingDownloads(storage, downloadsDir);
@@ -59,6 +75,7 @@ export function registerLibraryIpc(
   });
 
   ipcMain.handle('library:hide', async () => {
+    playingEpisodeId = null;
     libraryManager.hide();
   });
 
@@ -145,7 +162,9 @@ export function registerLibraryIpc(
       };
       const { getPlayerBaseUrl } = await import('../player/tau-localhost');
       const base = getPlayerBaseUrl();
-      await mainWindow.loadURL(base ? `${base}/embed/offline` : 'tau-player://bundle/embed/offline');
+      playingEpisodeId = episodeId;
+      playerUrl = base ? `${base}/embed/offline` : 'tau-player://bundle/embed/offline';
+      await mainWindow.loadURL(playerUrl);
       log.info(`[library] Playing offline episode: ${episodeId}`);
     }
   });

@@ -426,6 +426,13 @@ export class StorageService {
     }));
   }
 
+  markLibraryEpisodeWatched(episodeId: string): void {
+    this.db.prepare(`
+      INSERT OR IGNORE INTO library_watched (episode_id)
+      SELECT episode_id FROM episode_metadata WHERE episode_id = ?
+    `).run(episodeId);
+  }
+
   getLibraryEpisodes(animeTitle: string): {
     episodeId: string;
     animeTitle: string;
@@ -436,11 +443,14 @@ export class StorageService {
     sizeBytes: number;
     createdAt: number;
     offlineUrl: string;
+    watched: boolean;
   }[] {
     const rows = this.db
       .prepare(
         `SELECT episode_id, anime_title, season_number, episode_number,
-                translator, source, size_bytes, created_at
+                translator, source, size_bytes, created_at,
+                EXISTS (SELECT 1 FROM library_watched w
+                        WHERE w.episode_id = episode_metadata.episode_id) AS watched
          FROM episode_metadata
          WHERE anime_title = ?
          ORDER BY season_number ASC, CAST(episode_number AS INTEGER) ASC`
@@ -456,6 +466,7 @@ export class StorageService {
       sizeBytes: r['size_bytes'] as number,
       createdAt: r['created_at'] as number,
       offlineUrl: `animecix-offline://episode/${r['episode_id']}/video`,
+      watched: Boolean(r['watched']),
     }));
   }
 

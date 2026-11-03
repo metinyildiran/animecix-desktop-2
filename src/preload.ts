@@ -141,6 +141,8 @@ const api: AnimecixAPI = {
   getLibraryAnimes: () => ipcRenderer.invoke('library:getAnimes'),
   getLibraryEpisodes: (animeTitle: string) => ipcRenderer.invoke('library:getEpisodes', animeTitle),
   showLibrary: () => ipcRenderer.invoke('library:show'),
+  reportLibraryProgress: (episodeId: string, currentTime: number, duration: number) =>
+    ipcRenderer.invoke('library:progress', episodeId, currentTime, duration),
   hideLibrary: () => ipcRenderer.invoke('library:hide'),
   playOfflineEpisode: (episodeId: string) => ipcRenderer.invoke('library:playEpisode', episodeId),
   getOfflineVideoData: () => ipcRenderer.invoke('library:getOfflineVideoData'),

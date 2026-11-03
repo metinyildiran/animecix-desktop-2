@@ -47,6 +47,17 @@ export function EpisodeRow({ episode, onDelete }: Props) {
 
       <span style={{ fontWeight: 600, fontSize: 14, minWidth: 70 }}>
         {label}
+        {episode.watched && (
+          <svg
+            role="img" aria-label="İzlendi"
+            width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2.5"
+            style={{ color: '#4ade80', marginLeft: 6, verticalAlign: 'middle' }}
+          >
+            <title>İzlendi</title>
+            <path d="m5 12 4 4L19 6" />
+          </svg>
+        )}
       </span>
 
       <span style={{

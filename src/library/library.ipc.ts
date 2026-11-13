@@ -79,6 +79,12 @@ export function registerLibraryIpc(
     libraryManager.hide();
   });
 
+  ipcMain.handle('downloads:show', async () => {
+    playingEpisodeId = null;
+    pruneMissingDownloads(storage, downloadsDir);
+    libraryManager.show('downloads');
+  });
+
   ipcMain.handle('library:getOfflineVideoData', async () => {
     const data = pendingOfflineData;
     pendingOfflineData = null;

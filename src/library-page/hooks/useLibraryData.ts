@@ -1,21 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { LibraryAnime, LibraryEpisode } from '../types';
 
-declare global {
-  interface Window {
-    animecix?: {
-      getLibraryAnimes: () => Promise<LibraryAnime[]>;
-      getLibraryEpisodes: (animeTitle: string) => Promise<LibraryEpisode[]>;
-      showLibrary: () => Promise<void>;
-      hideLibrary: () => Promise<void>;
-      playOfflineEpisode: (episodeId: string) => Promise<void>;
-      deleteDownload: (episodeId: string) => Promise<void>;
-      deleteCache: (episodeId: string) => Promise<void>;
-      isOnline: () => boolean;
-    };
-  }
-}
-
 export function useLibraryData() {
   const [animes, setAnimes] = useState<LibraryAnime[]>([]);
   const [loading, setLoading] = useState(true);

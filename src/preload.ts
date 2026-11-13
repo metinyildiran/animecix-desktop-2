@@ -141,6 +141,7 @@ const api: AnimecixAPI = {
   getLibraryAnimes: () => ipcRenderer.invoke('library:getAnimes'),
   getLibraryEpisodes: (animeTitle: string) => ipcRenderer.invoke('library:getEpisodes', animeTitle),
   showLibrary: () => ipcRenderer.invoke('library:show'),
+  showDownloads: () => ipcRenderer.invoke('downloads:show'),
   reportLibraryProgress: (episodeId: string, currentTime: number, duration: number) =>
     ipcRenderer.invoke('library:progress', episodeId, currentTime, duration),
   hideLibrary: () => ipcRenderer.invoke('library:hide'),
@@ -183,3 +184,17 @@ const updaterApi: UpdaterApi = {
 
 contextBridge.exposeInMainWorld('animecix', api);
 contextBridge.exposeInMainWorld('animecixAPI', { updater: updaterApi });
+
+// The hosted website still opens its legacy downloads dialog. Capture only
+// its downloads navigation button until the website adopts showDownloads().
+if (location.origin === new URL(import.meta.env.VITE_SITE_URL).origin
+  || (import.meta.env.DEV && location.origin === 'http://localhost:4200')) {
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target.closest('button') : null;
+    const label = target?.getAttribute('aria-label') || target?.textContent?.trim();
+    if (!label || !/(?:^|\s)İndirilenler(?:\s|$)/u.test(label)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void api.showDownloads();
+  }, true);
+}

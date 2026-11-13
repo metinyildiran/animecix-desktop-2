@@ -1,0 +1,25 @@
+.app-navigation {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 56px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  padding: 0 150px 0 16px;
+  background: #1d1d1d;
+  border-bottom: 1px solid #ffffff12;
+  -webkit-app-region: drag;
+}
+.app-navigation.mac { padding-left: 82px; padding-right: 16px; }
+.app-navigation nav { display: flex; gap: 4px; overflow-x: auto; -webkit-app-region: no-drag; }
+.app-navigation button {
+  flex-shrink: 0;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: #b9c1ca;
+  background: transparent;
+  font-size: 13px;
+}
+.app-navigation button:hover { background: #ffffff0c; color: #fff; }
+.app-navigation button[aria-current=page] { color: #c7e4ff; background: #408ed025; }
+.app-navigation [role=alert] { color: #ffa6a6; font-size: 12px; margin-left: 12px; }

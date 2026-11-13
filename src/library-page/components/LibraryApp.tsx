@@ -58,8 +58,7 @@ export function LibraryApp() {
     );
   }
 
-  const isWindows = navigator.platform.startsWith('Win');
-  const titlebarOffset = isWindows ? 40 : 0;
+  const titlebarOffset = 56;
 
   return (
     <div style={{

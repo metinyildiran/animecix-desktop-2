@@ -13,10 +13,11 @@ export class LibraryManager {
     });
   }
 
-  show(): void {
-    if (this.active) return;
+  show(page: 'library' | 'downloads' = 'library'): void {
+    const url = page === 'downloads' ? 'animecix-library://bundle/downloads' : 'animecix-library://bundle/';
+    if (this.active && this.mainWindow.webContents.getURL() === url) return;
     this.active = true;
-    void this.mainWindow.loadURL('animecix-library://bundle/');
+    void this.mainWindow.loadURL(url);
     log.info('[library] Navigated mainWindow to library page');
   }
 

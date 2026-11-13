@@ -7,7 +7,7 @@ interface Props {
 
 export function SearchBar({ value, onChange }: Props) {
   const [localValue, setLocalValue] = useState(value);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;

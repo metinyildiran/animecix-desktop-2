@@ -160,6 +160,7 @@ export interface AnimecixAPI {
   getLibraryAnimes: () => Promise<LibraryAnime[]>;
   getLibraryEpisodes: (animeTitle: string) => Promise<LibraryEpisode[]>;
   showLibrary: () => Promise<void>;
+  showDownloads: () => Promise<void>;
   reportLibraryProgress: (episodeId: string, currentTime: number, duration: number) => Promise<void>;
   hideLibrary: () => Promise<void>;
   playOfflineEpisode: (episodeId: string) => Promise<void>;
